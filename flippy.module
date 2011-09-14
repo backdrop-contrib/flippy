@@ -119,6 +119,7 @@ function flippy_build_list($node) {
     $query = db_select('node')
       ->fields('node', array('nid'))
       ->condition('nid', $node->nid, '!=')
+      ->condition('status', 1)
       ->condition('type', $node->type, '=')
       ->range(0, 1);
 
@@ -162,8 +163,9 @@ function _flippy_nids_to_nodes(array $pager) {
   return $pager;
 }
 
-function template_preprocess_flippy($vars) {
+function template_preprocess_flippy(&$vars) {
   drupal_add_css(drupal_get_path('module', 'flippy') . '/flippy.css');
+
   if ($nav = $vars['list']) {
     $vars['first_link'] = empty($nav['first']) ? '' : l('‹ ' . t('first'), 'node/' . $nav['first']);
     $vars['previous_link'] =  empty($nav['prev']) ? '' : l('‹ ' . t('previous'), 'node/' . $nav['prev']);
