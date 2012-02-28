@@ -162,13 +162,13 @@ function flippy_field_extra_fields() {
  * Implements hook_node_view().
  */
 function flippy_node_view($node, $view_mode = 'full') {
-  if (variable_get('flippy_'. $node->type, NULL)) {
+  if (node_is_page($node) && variable_get('flippy_'. $node->type, NULL)) {
     $node->content['flippy_pager'] = array(
       '#theme' => 'flippy',
       '#list' => flippy_build_list($node),
     );
     
-    if (node_is_page($node) && variable_get('flippy_head_' . $node->type, NULL)) {
+    if (variable_get('flippy_head_' . $node->type, NULL)) {
       $links = flippy_build_list($node);
       if (!empty($links['prev'])) {
         drupal_add_html_head_link(array(
