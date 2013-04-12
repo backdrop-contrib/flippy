@@ -204,13 +204,21 @@ function flippy_build_list($node) {
 
     $prev = clone $query;
     $list['prev'] = $prev
-      ->condition('created', $node->created, '<=')
+      ->condition(db_or()
+        ->condition('created', $node->created, '<')
+        ->condition(db_and()
+          ->condition('created', $node->created, '=')
+          ->condition('nid', $node->nid, '<')))
       ->orderBy('created', 'DESC')
       ->execute()->fetchAssoc();
 
     $next = clone $query;
     $list['next'] = $next
-      ->condition('created', $node->created, '>=')
+      ->condition(db_or()
+        ->condition('created', $node->created, '>')
+        ->condition(db_and()
+          ->condition('created', $node->created, '=')
+          ->condition('nid', $node->nid, '>')))
       ->orderBy('created', 'ASC')
       ->execute()->fetchAssoc();
 
