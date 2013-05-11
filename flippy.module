@@ -193,7 +193,11 @@ function flippy_build_list($node) {
 
     $first = clone $query;
     $list['first'] = $first
-      ->condition('created', $node->created, '<=')
+      ->condition(db_or()
+        ->condition('created', $node->created, '<')
+        ->condition(db_and()
+          ->condition('created', $node->created, '=')
+          ->condition('nid', $node->nid, '<')))
       ->orderBy('created', 'ASC')
       ->execute()->fetchAssoc();
 
@@ -224,7 +228,11 @@ function flippy_build_list($node) {
 
     $last = clone $query;
     $list['last'] = $last
-      ->condition('created', $node->created, '>=')
+      ->condition(db_or()
+        ->condition('created', $node->created, '>')
+        ->condition(db_and()
+          ->condition('created', $node->created, '=')
+          ->condition('nid', $node->nid, '>')))
       ->orderBy('created', 'DESC')
       ->execute()->fetchAssoc();
     
