@@ -74,7 +74,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Previous" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_prev_label']) ? $form['flippy']['flippy_prev_label'] : variable_get('flippy_prev_label_' . $form['#node_type']->type, 'Previous'),
+      '#default_value' => isset($form['flippy']['flippy_prev_label']) ? $form['flippy']['flippy_prev_label'] : variable_get('flippy_prev_label_' . $form['#node_type']->type, '‹ ' . t('Previous')),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -87,7 +87,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Next" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_next_label']) ? $form['flippy']['flippy_next_label'] : variable_get('flippy_next_label_' . $form['#node_type']->type, 'Next'),
+      '#default_value' => isset($form['flippy']['flippy_next_label']) ? $form['flippy']['flippy_next_label'] : variable_get('flippy_next_label_' . $form['#node_type']->type, t('Next') . ' ›'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -111,7 +111,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "First" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_first_label']) ? $form['flippy']['flippy_first_label'] : variable_get('flippy_first_label_' . $form['#node_type']->type, 'First'),
+      '#default_value' => isset($form['flippy']['flippy_first_label']) ? $form['flippy']['flippy_first_label'] : variable_get('flippy_first_label_' . $form['#node_type']->type, '« ' . t('First')),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy_firstlast]' => array('checked' => TRUE),
@@ -125,7 +125,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Last" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_last_label']) ? $form['flippy']['flippy_last_label'] : variable_get('flippy_last_label_' . $form['#node_type']->type, 'Last'),
+      '#default_value' => isset($form['flippy']['flippy_last_label']) ? $form['flippy']['flippy_last_label'] : variable_get('flippy_last_label_' . $form['#node_type']->type, t('Last')  . ' »'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy_firstlast]' => array('checked' => TRUE),
@@ -284,8 +284,8 @@ function template_preprocess_flippy(&$vars) {
 
   if ($nav = $vars['list']) {
     if (variable_get('flippy_firstlast_'. $vars['node']->type, NULL)) {
-      $vars['first_link'] = empty($nav['first']) ? '' : l('« ' . t(variable_get('flippy_first_label_' . $vars['node']->type, NULL)), 'node/' . $nav['first']['nid']);
-      $vars['last_link'] = empty($nav['last']) ? '' : l(t(variable_get('flippy_last_label_' . $vars['node']->type, NULL)) . ' »', 'node/' . $nav['last']['nid']);
+      $vars['first_link'] = empty($nav['first']) ? '' : l(t(variable_get('flippy_first_label_' . $vars['node']->type, NULL)), 'node/' . $nav['first']['nid']);
+      $vars['last_link'] = empty($nav['last']) ? '' : l(t(variable_get('flippy_last_label_' . $vars['node']->type, NULL)), 'node/' . $nav['last']['nid']);
     }
 
     if (variable_get('flippy_random_'. $vars['node']->type, NULL)) {
@@ -294,8 +294,8 @@ function template_preprocess_flippy(&$vars) {
 
     switch ($label_type) {
       case '0':
-        $vars['previous_link'] = empty($nav['prev']) ? '' : l('‹ ' . t(variable_get('flippy_prev_label_' . $vars['node']->type, NULL)), 'node/' . $nav['prev']['nid']);
-        $vars['next_link'] = empty($nav['next']) ? '' : l(t(variable_get('flippy_next_label_' . $vars['node']->type, NULL)) . ' ›', 'node/' . $nav['next']['nid']);
+        $vars['previous_link'] = empty($nav['prev']) ? '' : l(t(variable_get('flippy_prev_label_' . $vars['node']->type, NULL)), 'node/' . $nav['prev']['nid']);
+        $vars['next_link'] = empty($nav['next']) ? '' : l(t(variable_get('flippy_next_label_' . $vars['node']->type, NULL)), 'node/' . $nav['next']['nid']);
         break;
       case '1':
         $vars['previous_link'] = empty($nav['prev']) ? '' : l('‹ ' . t($nav['prev']['title']), 'node/' . $nav['prev']['nid']);
