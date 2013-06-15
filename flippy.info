@@ -1,6 +1,7 @@
 name = Flippy
 core = 7.x
 description = Allows administrators to define custom pagers for navigation in lists of nodes.
+dependencies[] = token
 
 files[] = flippy.tpl.php
 files[] = flippy.install

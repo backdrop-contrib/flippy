@@ -52,22 +52,16 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
         ),
       ),
     );
-
-    $form['flippy']['flippy_label_type'] = array(
-      '#type' => 'select',
-      '#title' => t('Pager label type'),
-      '#options' => array(
-        0 => t('Custom text'),
-        1 => t('Node title'),
-        2 => t('Node ID'),
-      ),
-      '#default_value' => isset($form['flippy']['flippy_label_type']) ? $form['flippy']['flippy_label_type'] : variable_get('flippy_label_type_' . $form['#node_type']->type, 0),
-      '#description' => t('Select label type to display'),
+    $form['flippy']['flippy_show_empty'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show empty links'),
+      '#default_value' => isset($form['flippy']['flippy_show_empty']) ? $form['flippy']['flippy_show_empty'] : variable_get('flippy_show_empty_' . $form['#node_type']->type, TRUE),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
         ),
       ),
+      '#description' => t('If checked, empty links will be rendered even if there isn\'t a node in the sequence. For example, if there is no "next" node, the "next" label will be shown but without a link. If tokens are being used, it is recommended that this be unchecked.'), 
     );
 
     $form['flippy']['flippy_prev_label'] = array(
@@ -78,7 +72,6 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
-          ':input[name=flippy_label_type]' => array('value' => 0),
         ),
       ),
     );
@@ -91,7 +84,6 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
-          ':input[name=flippy_label_type]' => array('value' => 0),
         ),
       ),
     );
@@ -125,7 +117,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Last" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_last_label']) ? $form['flippy']['flippy_last_label'] : variable_get('flippy_last_label_' . $form['#node_type']->type, t('Last')  . ' »'),
+      '#default_value' => isset($form['flippy']['flippy_last_label']) ? $form['flippy']['flippy_last_label'] : variable_get('flippy_last_label_' . $form['#node_type']->type, t('Last') . ' »'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy_firstlast]' => array('checked' => TRUE),
@@ -157,7 +149,50 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
         ),
       ),
     );
+    
+    $form['flippy']['flippy_token'] = array(
+      '#type' => 'fieldset',
+      '#collapsible' => TRUE,
+      '#collapsed' => TRUE,
+      '#title' => t('Browse available tokens'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name=flippy]' => array('checked' => TRUE),
+        ),
+      ),
+    );
 
+    $form['flippy']['flippy_token']['flippy_token_browser'] = array(
+      '#theme' => 'token_tree',
+      '#token_types' => array('node'),
+    );
+    
+    
+    $form['flippy']['flippy_truncate'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Truncate label length'),
+      '#size' => 32,
+      '#default_value' => isset($form['flippy']['flippy_truncate']) ? $form['flippy']['flippy_truncate'] : variable_get('flippy_truncate_' . $form['#node_type']->type, NULL),
+      '#description' => t('Optionally provide a maximum amount length that link labels can be. Labels will be shortened to this length if they exceed the amount of characters.'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name=flippy]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+    
+    $form['flippy']['flippy_ellipse'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Truncate ellipse'),
+      '#size' => 32,
+      '#default_value' => isset($form['flippy']['flippy_ellipse']) ? $form['flippy']['flippy_ellipse'] : variable_get('flippy_ellipse_' . $form['#node_type']->type, '...'),
+      '#description' => t('If a maximum label length is set above, an ellipse can be provided here which will be appended to the label after it is shortened.'),
+      '#states' => array(
+        'visible' => array(
+          ':input[name=flippy]' => array('checked' => TRUE),
+        ),
+      ),
+    );
   }
 }
 
@@ -274,39 +309,83 @@ function flippy_build_list($node) {
  *  Implements template_preprocess_hook()
  */
 function template_preprocess_flippy(&$vars) {
+  $links = array();
   drupal_add_css(drupal_get_path('module', 'flippy') . '/flippy.css');
+  
   // for getting node type
-  if ($node = menu_get_object()) {
+  if ($node = menu_get_object('node')) {
     $vars['node'] = $node;
   }
 
-  $label_type = variable_get('flippy_label_type_' . $vars['node']->type, NULL);
+  // Collect all of the node ids in the list
+  $nids = array();
+  foreach ($vars['list'] as $item) {
+    if (isset($item['nid'])) {
+      $nids[] = $item['nid'];
+    }
+  }
+  
+  // Load all of the nodes
+  $list_nodes = node_load_multiple($nids);
 
   if ($nav = $vars['list']) {
     if (variable_get('flippy_firstlast_'. $vars['node']->type, NULL)) {
-      $vars['first_link'] = empty($nav['first']) ? '' : l(t(variable_get('flippy_first_label_' . $vars['node']->type, NULL)), 'node/' . $nav['first']['nid']);
-      $vars['last_link'] = empty($nav['last']) ? '' : l(t(variable_get('flippy_last_label_' . $vars['node']->type, NULL)), 'node/' . $nav['last']['nid']);
+      $links['first'] = array(
+        'title' => t(variable_get('flippy_first_label_' . $vars['node']->type, NULL)),
+        'href' => empty($nav['first']) ? '' : ('node/' . $nav['first']['nid']),
+      );
+      $links['last'] = array(
+        'title' => t(variable_get('flippy_last_label_' . $vars['node']->type, NULL)),
+        'href' => empty($nav['last']) ? '' : ('node/' . $nav['last']['nid']),
+      );
     }
 
     if (variable_get('flippy_random_'. $vars['node']->type, NULL)) {
-      $vars['random_link'] = empty($nav['random']) ? '' : l(t(variable_get('flippy_random_label_' . $vars['node']->type, NULL)), 'node/' . $nav['random']['nid']);
+      $links['random'] = array(
+        'title' => t(variable_get('flippy_random_label_' . $vars['node']->type, NULL)),
+        'href' => empty($nav['random']) ? '' : ('node/' . $nav['random']['nid']),
+      );
     }
 
-    switch ($label_type) {
-      case '0':
-        $vars['previous_link'] = empty($nav['prev']) ? '' : l(t(variable_get('flippy_prev_label_' . $vars['node']->type, NULL)), 'node/' . $nav['prev']['nid']);
-        $vars['next_link'] = empty($nav['next']) ? '' : l(t(variable_get('flippy_next_label_' . $vars['node']->type, NULL)), 'node/' . $nav['next']['nid']);
-        break;
-      case '1':
-        $vars['previous_link'] = empty($nav['prev']) ? '' : l('‹ ' . t($nav['prev']['title']), 'node/' . $nav['prev']['nid']);
-        $vars['next_link'] = empty($nav['next']) ? '' : l(t($nav['next']['title']) . ' ›', 'node/' . $nav['next']['nid']);
-        break;
-      case '2':
-        $vars['previous_link'] = empty($nav['prev']) ? '' : l('‹ ' . t($nav['prev']['nid']), 'node/' . $nav['prev']['nid']);
-        $vars['next_link'] = empty($nav['next']) ? '' : l(t($nav['next']['nid']) . ' ›', 'node/' . $nav['next']['nid']);
-        break;
+    $links['prev'] = array(
+      'title' => t(variable_get('flippy_prev_label_' . $vars['node']->type, NULL)),
+      'href' => empty($nav['prev']) ? '' : ('node/' . $nav['prev']['nid']),
+    );
+    $links['next'] = array(
+      'title' => t(variable_get('flippy_next_label_' . $vars['node']->type, NULL)),
+      'href' => empty($nav['next']) ? '' : ('node/' . $nav['next']['nid']),
+    );
+      
+  }
+  
+  // Replace any tokens present in the links
+  foreach ($links as $key => &$link) {
+    if (isset($nav[$key]['nid']) && $nav[$key]['nid']) {
+      if (isset($list_nodes[$nav[$key]['nid']])) {
+        $link['title'] = token_replace($link['title'], array('node' => $list_nodes[$nav[$key]['nid']]));
+      }
     }
   }
+  
+  // See if we need to truncate labels
+  if ($truncate = variable_get('flippy_truncate_' . $vars['node']->type, NULL)) {
+    if (is_numeric($truncate)) {
+      foreach ($links as $key => &$link) {
+        if (strlen($link['title']) > $truncate) {
+          $link['title'] = substr($link['title'], 0, $truncate) . variable_get('flippy_ellipse_' . $vars['node']->type, '...');
+        }
+      }
+    }
+  }
+ 
+  // Set the order that we want the links to be in
+  foreach (array('first', 'prev', 'random', 'next', 'last') as $order) {
+    if (isset($links[$order])) {
+      $vars['links'][$order] = $links[$order];
+    }
+  }
+
+  $vars['show_empty'] = variable_get('flippy_show_empty_' . $vars['node']->type, TRUE);
   $vars = array_merge($vars, $vars['list']);
   unset($vars['list']);
   unset($vars['node']);
