@@ -295,10 +295,12 @@ function flippy_build_list($node) {
       ->orderBy('created', 'DESC')
       ->execute()->fetchAssoc();
     
-    $random = clone $query;
-    $list['random'] = $random
-      ->orderRandom()
-      ->execute()->fetchAssoc();
+    if (variable_get('flippy_random_' . $node->type, NULL)) {
+      $random = clone $query;
+      $list['random'] = $random
+        ->orderRandom()
+        ->execute()->fetchAssoc();
+    }
 
     $master_list[$node->nid] = $list;
   }
