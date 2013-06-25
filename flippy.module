@@ -334,28 +334,28 @@ function template_preprocess_flippy(&$vars) {
     if (variable_get('flippy_firstlast_'. $vars['node']->type, NULL)) {
       $links['first'] = array(
         'title' => t(variable_get('flippy_first_label_' . $vars['node']->type, NULL)),
-        'href' => empty($nav['first']) ? '' : ('node/' . $nav['first']['nid']),
+        'href' => empty($nav['first']) ? '' : drupal_get_path_alias('node/' . $nav['first']['nid'], 'und'),
       );
       $links['last'] = array(
         'title' => t(variable_get('flippy_last_label_' . $vars['node']->type, NULL)),
-        'href' => empty($nav['last']) ? '' : ('node/' . $nav['last']['nid']),
+        'href' => empty($nav['last']) ? '' : drupal_get_path_alias('node/' . $nav['last']['nid'], 'und'),
       );
     }
 
     if (variable_get('flippy_random_'. $vars['node']->type, NULL)) {
       $links['random'] = array(
         'title' => t(variable_get('flippy_random_label_' . $vars['node']->type, NULL)),
-        'href' => empty($nav['random']) ? '' : ('node/' . $nav['random']['nid']),
+        'href' => empty($nav['random']) ? '' : drupal_get_path_alias('node/' . $nav['random']['nid'], 'und'),
       );
     }
 
     $links['prev'] = array(
       'title' => t(variable_get('flippy_prev_label_' . $vars['node']->type, NULL)),
-      'href' => empty($nav['prev']) ? '' : ('node/' . $nav['prev']['nid']),
+      'href' => empty($nav['prev']) ? '' : drupal_get_path_alias('node/' . $nav['prev']['nid'], 'und'),
     );
     $links['next'] = array(
       'title' => t(variable_get('flippy_next_label_' . $vars['node']->type, NULL)),
-      'href' => empty($nav['next']) ? '' : ('node/' . $nav['next']['nid']),
+      'href' => empty($nav['next']) ? '' : drupal_get_path_alias('node/' . $nav['next']['nid'], 'und'),
     );
       
   }
