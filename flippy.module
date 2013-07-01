@@ -399,24 +399,31 @@ function template_preprocess_flippy(&$vars) {
  */
 function flippy_block_info() {
   $blocks = array();
-  
+
   // Provide a pager block that will work for all node types
   $blocks['flippy_pager'] = array(
     'info' => t('Flippy Pager (all node types)'),
     'cache' => DRUPAL_NO_CACHE
   );
-  
+
   // Provide node-type specific pager blocks
   foreach (node_type_get_types() as $type) {
     // See if this node type has pagers enabled
     if (variable_get("flippy_{$type->type}", FALSE)) {
-      $blocks["flippy_pager-node_type-{$type->type}"] = array(
+      // Add support for machine names > 32 chars
+      if (strlen("flippy_pager-node_type-{$type->type}") > 32) {
+        $delta = flippy_block_hash_delta($type->type);
+      }
+      else {
+        $delta = "flippy_pager-node_type-{$type->type}";
+      }
+      $blocks[$delta] = array(
         'info' => t('Flippy Pager (@type nodes)', array('@type' => $type->name)),
         'cache' => DRUPAL_NO_CACHE
       );
     }
   }
-  
+
   return $blocks;
 }
 
@@ -428,6 +435,13 @@ function flippy_block_view($delta = '') {
     return flippy_pager_block($delta);
   }
   return NULL;
+}
+
+/**
+ * function to return a hash for deltas longer than 32 characters
+ */
+function flippy_block_hash_delta($delta) {
+  return 'flippy_pager-node_type-' . substr(drupal_hash_base64($delta), 0, 9);
 }
 
 /**
@@ -444,6 +458,16 @@ function flippy_pager_block($delta = '') {
   // Detect if this pager should be for all nodes or just a given type
   if (strstr($delta, 'flippy_pager-node_type-')) {
     $type = str_replace('flippy_pager-node_type-', '', $delta);
+    // If $type isn't a content type we know it was hashed so must rehash to find the type
+    $types = node_type_get_names();
+    if (!array_key_exists($type, $types)) {
+      foreach ($types as $machine => $name) {
+        $hash = flippy_block_hash_delta($machine);
+        if ($delta == $hash) {
+          $type = $machine;
+        }
+      }
+    }
   }
   else {
     $type = NULL;
