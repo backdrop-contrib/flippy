@@ -342,11 +342,13 @@ function flippy_build_list($node) {
     $up = ($order == 'ASC') ? 'ASC' : 'DESC';
     $down = ($order == 'ASC') ? 'DESC' : 'ASC';
     // Create a starting-point EntityFieldQuery object
+    global $language;
     $query = new EntityFieldQuery();
     $query->entityCondition('entity_type', 'node')
       ->entityCondition('bundle', $node->type)
       ->propertyCondition('status', 1)
       ->propertyCondition('nid', $node->nid, '!=')
+      ->propertyCondition('language', array($language->language, LANGUAGE_NONE), 'IN')
       ->range(0, 1);
     // Create the individual queries
      $first = clone $query;
