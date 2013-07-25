@@ -349,12 +349,14 @@ function flippy_build_list($node) {
       ->propertyCondition('status', 1)
       ->propertyCondition('nid', $node->nid, '!=')
       ->propertyCondition('language', array($language->language, LANGUAGE_NONE), 'IN')
-      ->range(0, 1);
+      ->range(0, 1)
+      ->addTag('node_access');
     // Create the individual queries
      $first = clone $query;
      $prev = clone $query;
      $next = clone $query;
      $last = clone $query;
+     $random = clone $query;
     // We will construct the queries differently depending on whether the sorting
     // criteria is a field or a base table property.
     // If we found a field value earlier, we know we're dealing with a field
@@ -420,14 +422,22 @@ function flippy_build_list($node) {
     }
     // create random list 
     if (variable_get('flippy_random_' . $node->type, NULL)) {
-      $list['random'] = db_select('node')
-        ->fields('node', array('nid', 'title'))
-        ->condition('nid', $node->nid, '!=')
-        ->condition('status', 1)
-        ->condition('type', $node->type, '=')
-        ->range(0, 1)
-        ->orderRandom()
-        ->execute()->fetchAssoc();
+
+      $random->addTag('random');
+      $result = $random->execute();
+
+      if (isset($result['node'])) {
+        $nids = array_keys($result['node']);
+        foreach($nids as $nid) {
+          $node = node_load($nid);
+          $title = $node->title;
+          $list['random'] = array(
+            'nid' => $nid, 
+            'title' => $title,
+          );
+        }
+      }
+
     }
     // finally set the current info for themers to use
 
@@ -439,6 +449,13 @@ function flippy_build_list($node) {
     $master_list[$node->nid] = $list;
   }
   return $master_list[$node->nid];
+}
+
+/**
+ * Implement hook_query_TAG_alter()
+ */
+function flippy_query_random_alter($query){
+    $query->orderRandom();
 }
 
 /**
