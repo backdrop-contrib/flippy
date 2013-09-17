@@ -8,9 +8,6 @@
 
 /**
  * Implements hook_theme()
- *
- * @todo Please document this function.
- * @see http://drupal.org/node/1354
  */
 function flippy_theme() {
   return array(
@@ -61,7 +58,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
           ':input[name=flippy]' => array('checked' => TRUE),
         ),
       ),
-      '#description' => t('If checked, empty links will be rendered even if there isn\'t a node in the sequence. For example, if there is no "next" node, the "next" label will be shown but without a link. If tokens are being used, it is recommended that this be unchecked.'), 
+      '#description' => t('If checked, empty links will be rendered even if there isn\'t a node in the sequence. For example, if there is no "next" node, the "next" label will be shown but without a link. If tokens are being used, it is recommended that this be unchecked.'),
     );
 
     $form['flippy']['flippy_prev_label'] = array(
@@ -126,6 +123,17 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       ),
     );
 
+    $form['flippy']['flippy_loop'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Loop through nodes'),
+      '#default_value' => isset($form['flippy']['flippy_loop']) ? $form['flippy']['flippy_loop'] : variable_get('flippy_loop_' . $form['#node_type']->type, FALSE),
+      '#states' => array(
+        'visible' => array(   // action to take.
+          ':input[name=flippy]' => array('checked' => TRUE),
+        ),
+      ),
+    );
+
     $form['flippy']['flippy_random'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show random link'),
@@ -149,7 +157,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
         ),
       ),
     );
-    
+
     $form['flippy']['flippy_token'] = array(
       '#type' => 'fieldset',
       '#collapsible' => TRUE,
@@ -166,8 +174,8 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#theme' => 'token_tree',
       '#token_types' => array('node'),
     );
-    
-    
+
+
     $form['flippy']['flippy_truncate'] = array(
       '#type' => 'textfield',
       '#title' => t('Truncate label length'),
@@ -180,7 +188,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
         ),
       ),
     );
-    
+
     $form['flippy']['flippy_ellipse'] = array(
       '#type' => 'textfield',
       '#title' => t('Truncate ellipse'),
@@ -248,7 +256,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
 /**
  * List the base node properties that are allowed for custom pager sorting.
  * These should all correspond to to columns in the node table.
- * 
+ *
  * @return
  *   Associative array of $machine_name => $human_name
  */
@@ -270,10 +278,10 @@ function flippy_field_extra_fields() {
       $extra['node'][$type] = array(
         'display' => array(
           'flippy_pager' => array(
-            'label' => t('Pager'), 
-            'description' => t('Flippy module content pager.'), 
+            'label' => t('Pager'),
+            'description' => t('Flippy module content pager.'),
             'weight' => 5,
-          ), 
+          ),
         ),
       );
     }
@@ -320,7 +328,7 @@ function flippy_build_list($node) {
     // Validate that the sort criteria is OK to use
     $base_table_properties = array_keys(_flippy_sorting_properties());
     $field_value = NULL;
-    // If the sort criteria is not in the base_table_properties array, 
+    // If the sort criteria is not in the base_table_properties array,
     // we assume it's a field
     if (!in_array($sort, $base_table_properties)) {
       // get the value of the current node's field (use the first one only)
@@ -412,7 +420,7 @@ function flippy_build_list($node) {
         ->condition('n.nid', $node_ids, 'IN')
         ->execute()
         ->fetchAllAssoc('nid');
-      
+
       foreach ($node_ids as $key => $nid) {
         $list[$key] = array(
           'nid' => $nid,
@@ -420,7 +428,7 @@ function flippy_build_list($node) {
         );
       }
     }
-    // create random list 
+    // create random list
     if (variable_get('flippy_random_' . $node->type, NULL)) {
 
       $random->addTag('random');
@@ -432,7 +440,7 @@ function flippy_build_list($node) {
           $node = node_load($nid);
           $title = $node->title;
           $list['random'] = array(
-            'nid' => $nid, 
+            'nid' => $nid,
             'title' => $title,
           );
         }
@@ -464,7 +472,7 @@ function flippy_query_random_alter($query){
 function template_preprocess_flippy(&$vars) {
   $links = array();
   drupal_add_css(drupal_get_path('module', 'flippy') . '/flippy.css');
-  
+
   // for getting node type
   if ($node = menu_get_object('node')) {
     $vars['node'] = $node;
@@ -477,7 +485,7 @@ function template_preprocess_flippy(&$vars) {
       $nids[] = $item['nid'];
     }
   }
-  
+
   // Load all of the nodes
   $list_nodes = node_load_multiple($nids);
 
@@ -508,9 +516,9 @@ function template_preprocess_flippy(&$vars) {
       'title' => t(variable_get('flippy_next_label_' . $vars['node']->type, NULL)),
       'href' => empty($nav['next']) ? '' : drupal_get_path_alias('node/' . $nav['next']['nid'], 'und'),
     );
-      
+
   }
-  
+
   // Replace any tokens present in the links
   foreach ($links as $key => &$link) {
     if (isset($nav[$key]['nid']) && $nav[$key]['nid']) {
@@ -519,7 +527,7 @@ function template_preprocess_flippy(&$vars) {
       }
     }
   }
-  
+
   // See if we need to truncate labels
   if ($truncate = variable_get('flippy_truncate_' . $vars['node']->type, NULL)) {
     if (is_numeric($truncate)) {
@@ -530,7 +538,7 @@ function template_preprocess_flippy(&$vars) {
       }
     }
   }
- 
+
   // Set the order that we want the links to be in
   foreach (array('first', 'prev', 'random', 'next', 'last') as $order) {
     if (isset($links[$order])) {
@@ -538,6 +546,14 @@ function template_preprocess_flippy(&$vars) {
     }
   }
 
+  if (variable_get('flippy_loop_'. $vars['node']->type, NULL)) {
+    if (!$vars['links']['last']['href']) {
+      $vars['links']['next']['href'] = $vars['links']['first']['href'];
+    }
+    if (!$vars['links']['first']['href']) {
+      $vars['links']['prev']['href'] = $vars['links']['last']['href'];
+    }
+  }
   $vars['show_empty'] = variable_get('flippy_show_empty_' . $vars['node']->type, TRUE);
   $vars = array_merge($vars, $vars['list']);
   unset($vars['list']);
@@ -596,8 +612,8 @@ function flippy_block_hash_delta($delta) {
 }
 
 /**
- * Render the Flippy pager block. 
- * 
+ * Render the Flippy pager block.
+ *
  * @param $delta
  *   The delta passed into hook_block_view(). This will specify whether
  *   or not we this block should render a pager for all enabled node types
@@ -623,7 +639,7 @@ function flippy_pager_block($delta = '') {
   else {
     $type = NULL;
   }
-  
+
   // Detect if we're viewing a node
   if ($node = menu_get_object('node')) {
     // See if this node matches the type requested
@@ -637,12 +653,12 @@ function flippy_pager_block($delta = '') {
         );
         // Set head elements
         _flippy_add_head_elements($node);
-        
+
         return $block;
       }
     }
   }
-  
+
   return NULL;
 }
 
