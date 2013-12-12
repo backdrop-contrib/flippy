@@ -351,12 +351,12 @@ function flippy_build_list($node) {
     $down = ($order == 'ASC') ? 'DESC' : 'ASC';
     // Create a starting-point EntityFieldQuery object
     global $language;
-    $query = new EntityFieldQuery();
-    $query->entityCondition('entity_type', 'node')
-      ->entityCondition('bundle', $node->type)
-      ->propertyCondition('status', 1)
-      ->propertyCondition('nid', $node->nid, '!=')
-      ->propertyCondition('language', array($language->language, LANGUAGE_NONE), 'IN')
+    $query = db_select('node', 'n');
+    $query->Condition('type', $node->type)
+      ->Condition('status', 1)
+      ->Condition('nid', $node->nid, '!=')
+      ->Condition('n.language', array($language->language, LANGUAGE_NONE), 'IN')
+      ->fields('n', array('nid', 'title'))
       ->range(0, 1)
       ->addTag('node_access');
     // Create the individual queries
@@ -365,90 +365,89 @@ function flippy_build_list($node) {
      $next = clone $query;
      $last = clone $query;
      $random = clone $query;
+
     // We will construct the queries differently depending on whether the sorting
     // criteria is a field or a base table property.
     // If we found a field value earlier, we know we're dealing with a field
     if ($field_value) {
       // set the conditions
-      $first->fieldCondition($sort, 'value', $field_value, $before);
-      $prev->fieldCondition($sort, 'value', $field_value, $before);
-      $next->fieldCondition($sort, 'value', $field_value, $after);
-      $last->fieldCondition($sort, 'value', $field_value, $after);
+
+      // first and last queries
+      $first->join('field_data_' . $sort, $sort, 'n.nid = ' . $sort . '.entity_id');
+      $first->condition($sort . '.' . $sort . '_value', $field_value, $before);
+      $last->join('field_data_' . $sort, $sort, 'n.nid = ' . $sort . '.entity_id');
+      $last->condition($sort . '.' . $sort . '_value', $field_value, $after);
+
+      // previous and next queries
+      $prev->join('field_data_' . $sort, $sort, 'n.nid = ' . $sort . '.entity_id');
+      $prev->condition(db_or()
+        ->condition($sort . '.' . $sort . '_value', $field_value, $before)
+        ->condition(db_and()
+          ->condition($sort . '.' . $sort . '_value', $field_value, '=')
+          ->condition('n.nid', $node->nid, $before)
+        )
+      );
+
+      $next->join('field_data_' . $sort, $sort, 'n.nid = ' . $sort . '.entity_id');
+      $next->condition(db_or()
+          ->condition($sort . '.' . $sort . '_value', $field_value, $after)
+          ->condition(db_and()
+              ->condition($sort . '.' . $sort . '_value', $field_value, '=')
+              ->condition('n.nid', $node->nid, $after)
+          )
+      );
+
       // set the ordering
-      $first->fieldOrderBy($sort, 'value', $up);
-      $prev->fieldOrderBy($sort, 'value', $down);
-      $next->fieldOrderBy($sort, 'value', $up);
-      $last->fieldOrderBy($sort, 'value', $down);
+      $first->orderBy($sort . '.' . $sort . '_value', $up);
+      $prev->orderBy($sort . '.' . $sort . '_value', $down);
+      $next->orderBy($sort . '.' . $sort . '_value', $up);
+      $last->orderBy($sort . '.' . $sort . '_value', $down);
     }
     else {
       // Otherwise we assume the variable is a column in the base table (a property).
       // Like above, set the conditions
-      $first->propertyCondition($sort, $node->{$sort}, $before);
-      $prev->propertyCondition($sort, $node->{$sort}, $before);
-      $next->propertyCondition($sort, $node->{$sort}, $after);
-      $last->propertyCondition($sort, $node->{$sort}, $after);
+
+      // first and last queries
+      $first->condition($sort, $node->{$sort}, $before);
+      $last->condition($sort, $node->{$sort}, $after);
+
+      // previous and next queries
+      $prev->condition(db_or()
+        ->condition($sort, $node->{$sort}, $before)
+        ->condition(db_and()
+          ->condition($sort, $node->{$sort}, '=')
+          ->condition('nid', $node->nid, $before)
+        )
+      );
+      $next->condition(db_or()
+        ->condition($sort, $node->{$sort}, $after)
+        ->condition(db_and()
+          ->condition($sort, $node->{$sort}, '=')
+          ->condition('nid', $node->nid, $after)
+        )
+      );
       // set the ordering
-      $first->propertyOrderBy($sort, $up);
-      $prev->propertyOrderBy($sort, $down);
-      $next->propertyOrderBy($sort, $up);
-      $last->propertyOrderBy($sort, $down);
+      $first->orderBy($sort, $up);
+      $prev->orderBy($sort, $down);
+      $next->orderBy($sort, $up);
+      $last->orderBy($sort, $down);
     }
     // Execute the queries
-    $results = array();
-    $results['first'] = $first->execute();
-    $results['prev'] = $prev->execute();
-    $results['next'] = $next->execute();
-    $results['last'] = $last->execute();
-
-    $node_ids = array();
-    foreach ($results as $key => $result) {
-      // if the query returned no results, it means we're already
-      // at the beginning/end of the pager, so ignore those
-      if (count($result) > 0) {
-        // otherwise we save the node ID
-        $result_nids = array_keys($results[$key]['node']);
-        $node_ids[$key] = $result_nids[0];
-      }
-    }
-    // make our final array of node IDs and titles
     $list = array();
-    // but only if we actually found some matches
-    if (count($node_ids) > 0) {
-      // we also need titles to go with our node ids
-      $title_query = db_select('node', 'n')
-        ->fields('n', array('title', 'nid'))
-        ->condition('n.nid', $node_ids, 'IN')
-        ->execute()
-        ->fetchAllAssoc('nid');
+    $list['first'] = $first->execute()->fetchAssoc();
+    $list['prev'] = $prev->execute()->fetchAssoc();
+    $list['next'] = $next->execute()->fetchAssoc();
+    $list['last'] = $last->execute()->fetchAssoc();
 
-      foreach ($node_ids as $key => $nid) {
-        $list[$key] = array(
-          'nid' => $nid,
-          'title' => $title_query[$nid]->title,
-        );
-      }
-    }
     // create random list
     if (variable_get('flippy_random_' . $node->type, NULL)) {
 
-      $random->addTag('random');
-      $result = $random->execute();
-
-      if (isset($result['node'])) {
-        $nids = array_keys($result['node']);
-        foreach($nids as $nid) {
-          $node = node_load($nid);
-          $title = $node->title;
-          $list['random'] = array(
-            'nid' => $nid,
-            'title' => $title,
-          );
-        }
-      }
+      $random->orderRandom();
+      $list['random'] = $random->execute()->fetchAssoc();
 
     }
-    // finally set the current info for themers to use
 
+    // finally set the current info for themers to use
     $list['current'] = array(
       'nid' => $node->nid,
       'title' => $node->title,
@@ -457,13 +456,6 @@ function flippy_build_list($node) {
     $master_list[$node->nid] = $list;
   }
   return $master_list[$node->nid];
-}
-
-/**
- * Implement hook_query_TAG_alter()
- */
-function flippy_query_random_alter($query){
-    $query->orderRandom();
 }
 
 /**
