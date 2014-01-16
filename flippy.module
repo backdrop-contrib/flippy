@@ -352,13 +352,17 @@ function flippy_build_list($node) {
     // Create a starting-point EntityFieldQuery object
     global $language;
     $query = db_select('node', 'n');
-    $query->Condition('type', $node->type)
-      ->Condition('status', 1)
-      ->Condition('nid', $node->nid, '!=')
-      ->Condition('n.language', array($language->language, LANGUAGE_NONE), 'IN')
+    $query->condition('type', $node->type)
+      ->condition('status', 1)
+      ->condition('nid', $node->nid, '!=')
+      ->condition(db_or()
+        ->condition('n.language', array($language->language, LANGUAGE_NONE), 'IN')
+        ->condition('n.language', $node->language, '=')
+      )
       ->fields('n', array('nid', 'title'))
       ->range(0, 1)
-      ->addTag('node_access');
+      ->addTag('node_access')
+      ->addTag('alter_flippy_query');
     // Create the individual queries
      $first = clone $query;
      $prev = clone $query;
@@ -369,7 +373,7 @@ function flippy_build_list($node) {
     // We will construct the queries differently depending on whether the sorting
     // criteria is a field or a base table property.
     // If we found a field value earlier, we know we're dealing with a field
-    if ($field_value) {
+    if (isset($field_value)) {
       // set the conditions
 
       // first and last queries
