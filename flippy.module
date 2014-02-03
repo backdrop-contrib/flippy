@@ -319,11 +319,11 @@ function flippy_build_list($node) {
       // Get order
       $order = variable_get('flippy_order_' . $node->type, 'ASC');
       // Get sort
-      $sort = variable_get('flippy_sort_' . $node->type, 'created');
+      $sort  = variable_get('flippy_sort_' . $node->type, 'created');
     }
     else {
       $order = 'ASC';
-      $sort = 'created';
+      $sort  = 'created';
     }
     // Validate that the sort criteria is OK to use
     $base_table_properties = array_keys(_flippy_sorting_properties());
@@ -335,7 +335,7 @@ function flippy_build_list($node) {
       $current_field_items = field_get_items('node', $node, $sort);
       if (!isset($current_field_items[0]['value'])) {
         // should never happen, but just in case, fall back to post date ascending
-        $sort = 'created';
+        $sort  = 'created';
         $order = 'ASC';
       }
       else {
@@ -345,9 +345,9 @@ function flippy_build_list($node) {
     }
     // Depending on order, decide what before and after means
     $before = ($order == 'ASC') ? '<' : '>';
-    $after = ($order == 'ASC') ? '>' : '<';
+    $after  = ($order == 'ASC') ? '>' : '<';
     // Also decide what up and down means
-    $up = ($order == 'ASC') ? 'ASC' : 'DESC';
+    $up   = ($order == 'ASC') ? 'ASC' : 'DESC';
     $down = ($order == 'ASC') ? 'DESC' : 'ASC';
     // Create a starting-point EntityFieldQuery object
     global $language;
@@ -364,11 +364,11 @@ function flippy_build_list($node) {
       ->addTag('node_access')
       ->addTag('alter_flippy_query');
     // Create the individual queries
-     $first = clone $query;
-     $prev = clone $query;
-     $next = clone $query;
-     $last = clone $query;
-     $random = clone $query;
+    $first  = clone $query;
+    $prev   = clone $query;
+    $next   = clone $query;
+    $last   = clone $query;
+    $random = clone $query;
 
     // We will construct the queries differently depending on whether the sorting
     // criteria is a field or a base table property.
@@ -394,11 +394,11 @@ function flippy_build_list($node) {
 
       $next->join('field_data_' . $sort, $sort, 'n.nid = ' . $sort . '.entity_id');
       $next->condition(db_or()
-          ->condition($sort . '.' . $sort . '_value', $field_value, $after)
-          ->condition(db_and()
-              ->condition($sort . '.' . $sort . '_value', $field_value, '=')
-              ->condition('n.nid', $node->nid, $after)
-          )
+        ->condition($sort . '.' . $sort . '_value', $field_value, $after)
+        ->condition(db_and()
+          ->condition($sort . '.' . $sort . '_value', $field_value, '=')
+          ->condition('n.nid', $node->nid, $after)
+        )
       );
 
       // set the ordering
@@ -436,6 +436,10 @@ function flippy_build_list($node) {
       $next->orderBy($sort, $up);
       $last->orderBy($sort, $down);
     }
+    $first->orderBy('n.nid', $up);
+    $prev->orderBy('n.nid', $down);
+    $next->orderBy('n.nid', $up);
+    $last->orderBy('n.nid', $down);
     // Execute the queries
     $list = array();
     $list['first'] = $first->execute()->fetchAssoc();
