@@ -546,11 +546,11 @@ function template_preprocess_flippy(&$vars) {
   }
 
   if (variable_get('flippy_loop_'. $vars['node']->type, NULL)) {
-    if (!$vars['links']['last']['href']) {
-      $vars['links']['next']['href'] = $vars['links']['first']['href'];
+    if (!$vars['links']['next']['href']) {
+      $vars['links']['next']['href'] = empty($nav['first']) ? '' : drupal_get_path_alias('node/' . $nav['first']['nid'], 'und');
     }
-    if (!$vars['links']['first']['href']) {
-      $vars['links']['prev']['href'] = $vars['links']['last']['href'];
+    if (!$vars['links']['prev']['href']) {
+      $vars['links']['prev']['href'] = empty($nav['last']) ? '' : drupal_get_path_alias('node/' . $nav['last']['nid'], 'und');
     }
   }
   $vars['show_empty'] = variable_get('flippy_show_empty_' . $vars['node']->type, TRUE);
