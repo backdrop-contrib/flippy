@@ -532,7 +532,7 @@ function template_preprocess_flippy(&$vars) {
     if (is_numeric($truncate)) {
       foreach ($links as $key => &$link) {
         if (strlen($link['title']) > $truncate) {
-          $link['title'] = substr($link['title'], 0, $truncate) . variable_get('flippy_ellipse_' . $vars['node']->type, '...');
+          $link['title'] = mb_substr($link['title'], 0, $truncate) . variable_get('flippy_ellipse_' . $vars['node']->type, '...');
         }
       }
     }
