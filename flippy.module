@@ -548,11 +548,11 @@ function template_preprocess_flippy(&$vars) {
   if (variable_get('flippy_loop_'. $vars['node']->type, NULL)) {
     if (!$vars['links']['next']['href']) {
       $vars['links']['next']['href'] = empty($nav['first']) ? '' : drupal_get_path_alias('node/' . $nav['first']['nid'], 'und');
-      $vars['links']['next']['title'] = (empty($nav['first']) || empty($vars['links']['next']['title'])) ? '' : token_replace($link['title'], array('node' => $list_nodes[$nav['first']['nid']]));
+      $vars['links']['next']['title'] = (empty($nav['first']) || empty($vars['links']['next']['title'])) ? '' : token_replace($vars['links']['next']['title'], array('node' => $list_nodes[$nav['first']['nid']]));
     }
     if (!$vars['links']['prev']['href']) {
       $vars['links']['prev']['href'] = empty($nav['last']) ? '' : drupal_get_path_alias('node/' . $nav['last']['nid'], 'und');
-      $vars['links']['prev']['title'] = (empty($nav['last']) ||  empty($vars['links']['prev']['title'])) ? '' : token_replace($link['title'], array('node' => $list_nodes[$nav['last']['nid']]));
+      $vars['links']['prev']['title'] = (empty($nav['last']) ||  empty($vars['links']['prev']['title'])) ? '' : token_replace($vars['links']['prev']['title'], array('node' => $list_nodes[$nav['last']['nid']]));
     }
   }
   $vars['show_empty'] = variable_get('flippy_show_empty_' . $vars['node']->type, TRUE);
