@@ -354,7 +354,7 @@ function flippy_build_list($node) {
     $query = db_select('node', 'n');
     $query->condition('type', $node->type)
       ->condition('status', 1)
-      ->condition('nid', $node->nid, '!=')
+      ->condition('n.nid', $node->nid, '!=')
       ->condition(db_or()
         ->condition('n.language', array($language->language, LANGUAGE_NONE), 'IN')
         ->condition('n.language', $node->language, '=')
@@ -420,14 +420,14 @@ function flippy_build_list($node) {
         ->condition($sort, $node->{$sort}, $before)
         ->condition(db_and()
           ->condition($sort, $node->{$sort}, '=')
-          ->condition('nid', $node->nid, $before)
+          ->condition('n.nid', $node->nid, $before)
         )
       );
       $next->condition(db_or()
         ->condition($sort, $node->{$sort}, $after)
         ->condition(db_and()
           ->condition($sort, $node->{$sort}, '=')
-          ->condition('nid', $node->nid, $after)
+          ->condition('n.nid', $node->nid, $after)
         )
       );
       // set the ordering
