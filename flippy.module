@@ -352,8 +352,8 @@ function flippy_build_list($node) {
     // Create a starting-point EntityFieldQuery object
     global $language;
     $query = db_select('node', 'n');
-    $query->condition('type', $node->type)
-      ->condition('status', 1)
+    $query->condition('n.type', $node->type)
+      ->condition('n.status', 1)
       ->condition('n.nid', $node->nid, '!=')
       ->condition(db_or()
         ->condition('n.language', array($language->language, LANGUAGE_NONE), 'IN')
