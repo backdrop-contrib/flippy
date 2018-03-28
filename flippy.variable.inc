@@ -181,12 +181,14 @@ function flippy_variable_info($options) {
   // Allow certain base table properties for sorting
   $sort_options = _flippy_sorting_properties();
   // Also allow some entity fields
-  $content_type_fields = field_info_instances('node', $form['#node_type']->type);
-  foreach ($content_type_fields as $sort_field) {
-    $field_info = field_info_field($sort_field['field_name']);
-    if (isset($field_info['columns']) && isset($field_info['columns']['value'])) {
-      // only allow fields that have a 'value' column
-      $sort_options[$sort_field['field_name']] = $sort_field['label'];
+  $content_types = field_info_instances('node');
+  foreach ($content_types as $content_type) {
+    foreach ($content_type as $sort_field) {
+      $field_info = field_info_field($sort_field['field_name']);
+      if (isset($field_info['columns']) && isset($field_info['columns']['value'])) {
+        // only allow fields that have a 'value' column
+        $sort_options[$sort_field['field_name']] = $sort_field['label'];
+      }
     }
   }
   $variable['flippy_sort_[node_type]'] = array(
