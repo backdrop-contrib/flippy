@@ -209,7 +209,10 @@ function flippy_variable_info($options) {
     'description' => t('Select a direction to order the pager for this content type.', array(), $options),
     'repeat' => array(
       'type' => 'select',
-      'options' => array('ASC' => 'Ascending', 'DESC' => 'Descending'),
+      'options' => array(
+        'ASC' => 'Ascending',
+        'DESC' => 'Descending',
+      ),
       'default' => 'ASC',
     ),
     'localize' => TRUE,

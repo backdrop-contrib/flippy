@@ -15,3 +15,129 @@ function flippy_uninstall() {
     ->execute();
   cache_clear_all('variables', 'cache_bootstrap');
 }
+
+/**
+ * Implements hook_update_last_removed().
+ */
+function flippy_update_last_removed() {
+  return;
+}
+
+/**
+ * Implements hook_update_N().
+ */
+function flippy_update_1000() {
+  $config = config('flippy.settings');
+  $config->set('flippy_formnode_typetype', update_variable_get('flippy_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 39'));
+  $config->set('flippy_head_formnode_typetype', update_variable_get('flippy_head_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 45'));
+  $config->set('flippy_show_empty_formnode_typetype', update_variable_get('flippy_show_empty_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 55'));
+  $config->set('flippy_prev_label_formnode_typetype', update_variable_get('flippy_prev_label_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 68'));
+  $config->set('flippy_next_label_formnode_typetype', update_variable_get('flippy_next_label_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 80'));
+  $config->set('flippy_firstlast_formnode_typetype', update_variable_get('flippy_firstlast_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 91'));
+  $config->set('flippy_first_label_formnode_typetype', update_variable_get('flippy_first_label_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 103'));
+  $config->set('flippy_last_label_formnode_typetype', update_variable_get('flippy_last_label_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 117'));
+  $config->set('flippy_loop_formnode_typetype', update_variable_get('flippy_loop_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 129'));
+  $config->set('flippy_random_formnode_typetype', update_variable_get('flippy_random_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 140'));
+  $config->set('flippy_random_label_formnode_typetype', update_variable_get('flippy_random_label_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 152'));
+  $config->set('flippy_truncate_formnode_typetype', update_variable_get('flippy_truncate_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 181'));
+  $config->set('flippy_ellipse_formnode_typetype', update_variable_get('flippy_ellipse_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 194'));
+  $config->set('flippy_custom_sorting_formnode_typetype', update_variable_get('flippy_custom_sorting_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 206'));
+  $config->set('flippy_sort_formnode_typetype', update_variable_get('flippy_sort_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 229'));
+  $config->set('flippy_order_formnode_typetype', update_variable_get('flippy_order_formnode_typetype', 'dynamic variable in file /flippy/flippy.module line 242'));
+  $config->set('flippy_type', update_variable_get('flippy_type', 'dynamic variable in file /flippy/flippy.module line 275'));
+  $config->set('flippy_custom_sorting_nodetype', update_variable_get('flippy_custom_sorting_nodetype', 'dynamic variable in file /flippy/flippy.module line 316'));
+  $config->set('flippy_order_nodetype', update_variable_get('flippy_order_nodetype', 'dynamic variable in file /flippy/flippy.module line 318'));
+  $config->set('flippy_sort_nodetype', update_variable_get('flippy_sort_nodetype', 'dynamic variable in file /flippy/flippy.module line 320'));
+  $config->set('flippy_random_nodetype', update_variable_get('flippy_random_nodetype', 'dynamic variable in file /flippy/flippy.module line 449'));
+  $config->set('flippy_firstlast_varsnodetype', update_variable_get('flippy_firstlast_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 491'));
+  $config->set('flippy_first_label_varsnodetype', update_variable_get('flippy_first_label_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 493'));
+  $config->set('flippy_last_label_varsnodetype', update_variable_get('flippy_last_label_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 497'));
+  $config->set('flippy_random_varsnodetype', update_variable_get('flippy_random_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 502'));
+  $config->set('flippy_random_label_varsnodetype', update_variable_get('flippy_random_label_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 504'));
+  $config->set('flippy_prev_label_varsnodetype', update_variable_get('flippy_prev_label_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 510'));
+  $config->set('flippy_next_label_varsnodetype', update_variable_get('flippy_next_label_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 514'));
+  $config->set('flippy_truncate_varsnodetype', update_variable_get('flippy_truncate_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 529'));
+  $config->set('flippy_ellipse_varsnodetype', update_variable_get('flippy_ellipse_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 533'));
+  $config->set('flippy_loop_varsnodetype', update_variable_get('flippy_loop_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 546'));
+  $config->set('flippy_show_empty_varsnodetype', update_variable_get('flippy_show_empty_varsnodetype', 'dynamic variable in file /flippy/flippy.module line 556'));
+  $config->set('flippy_typetype', update_variable_get('flippy_typetype', 'dynamic variable in file /flippy/flippy.module line 578'));
+  $config->set('flippy_nodetype', update_variable_get('flippy_nodetype', 'dynamic variable in file /flippy/flippy.module line 675'));
+  $config->set('flippy_head_nodetype', update_variable_get('flippy_head_nodetype', 'dynamic variable in file /flippy/flippy.module line 687'));
+  update_variable_del('flippy_formnode_typetype');
+  update_variable_del('flippy_head_formnode_typetype');
+  update_variable_del('flippy_show_empty_formnode_typetype');
+  update_variable_del('flippy_prev_label_formnode_typetype');
+  update_variable_del('flippy_next_label_formnode_typetype');
+  update_variable_del('flippy_firstlast_formnode_typetype');
+  update_variable_del('flippy_first_label_formnode_typetype');
+  update_variable_del('flippy_last_label_formnode_typetype');
+  update_variable_del('flippy_loop_formnode_typetype');
+  update_variable_del('flippy_random_formnode_typetype');
+  update_variable_del('flippy_random_label_formnode_typetype');
+  update_variable_del('flippy_truncate_formnode_typetype');
+  update_variable_del('flippy_ellipse_formnode_typetype');
+  update_variable_del('flippy_custom_sorting_formnode_typetype');
+  update_variable_del('flippy_sort_formnode_typetype');
+  update_variable_del('flippy_order_formnode_typetype');
+  update_variable_del('flippy_type');
+  update_variable_del('flippy_custom_sorting_nodetype');
+  update_variable_del('flippy_order_nodetype');
+  update_variable_del('flippy_sort_nodetype');
+  update_variable_del('flippy_random_nodetype');
+  update_variable_del('flippy_firstlast_varsnodetype');
+  update_variable_del('flippy_first_label_varsnodetype');
+  update_variable_del('flippy_last_label_varsnodetype');
+  update_variable_del('flippy_random_varsnodetype');
+  update_variable_del('flippy_random_label_varsnodetype');
+  update_variable_del('flippy_prev_label_varsnodetype');
+  update_variable_del('flippy_next_label_varsnodetype');
+  update_variable_del('flippy_truncate_varsnodetype');
+  update_variable_del('flippy_ellipse_varsnodetype');
+  update_variable_del('flippy_loop_varsnodetype');
+  update_variable_del('flippy_show_empty_varsnodetype');
+  update_variable_del('flippy_typetype');
+  update_variable_del('flippy_nodetype');
+  update_variable_del('flippy_head_nodetype');
+}
+
+/**
+ * Implements hook_install().
+ */
+function flippy_install() {
+  // Dynamically generated variable data was detected.
+  // /flippy/flippy.module line 39
+  // /flippy/flippy.module line 45
+  // /flippy/flippy.module line 55
+  // /flippy/flippy.module line 68
+  // /flippy/flippy.module line 80
+  // /flippy/flippy.module line 91
+  // /flippy/flippy.module line 103
+  // /flippy/flippy.module line 117
+  // /flippy/flippy.module line 129
+  // /flippy/flippy.module line 140
+  // /flippy/flippy.module line 152
+  // /flippy/flippy.module line 181
+  // /flippy/flippy.module line 194
+  // /flippy/flippy.module line 206
+  // /flippy/flippy.module line 229
+  // /flippy/flippy.module line 242
+  // /flippy/flippy.module line 275
+  // /flippy/flippy.module line 316
+  // /flippy/flippy.module line 318
+  // /flippy/flippy.module line 320
+  // /flippy/flippy.module line 449
+  // /flippy/flippy.module line 491
+  // /flippy/flippy.module line 493
+  // /flippy/flippy.module line 497
+  // /flippy/flippy.module line 502
+  // /flippy/flippy.module line 504
+  // /flippy/flippy.module line 510
+  // /flippy/flippy.module line 514
+  // /flippy/flippy.module line 529
+  // /flippy/flippy.module line 533
+  // /flippy/flippy.module line 546
+  // /flippy/flippy.module line 556
+  // /flippy/flippy.module line 578
+  // /flippy/flippy.module line 675
+  // /flippy/flippy.module line 687
+}
