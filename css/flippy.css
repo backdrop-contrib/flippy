@@ -1,0 +1,18 @@
+ul.flippy {
+  margin: auto;
+  padding: 0px 20px;
+  text-align: center;
+  list-style: none; }
+  ul.flippy li {
+    margin: 0;
+    padding: 10px;
+    display: inline;
+    width: auto;
+    list-style-type: none;
+    list-style-image: none;
+    background: none;
+    white-space: nowrap; }
+  ul.flippy li.first.empty, ul.flippy li.last.empty {
+    display: none; }
+  ul.flippy li.prev.empty, ul.flippy li.next.empty {
+    color: LightGrey; }

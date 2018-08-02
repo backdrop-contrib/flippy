@@ -502,7 +502,7 @@ function flippy_build_list($node) {
  */
 function template_preprocess_flippy(&$vars) {
   $links = array();
-  backdrop_add_css(backdrop_get_path('module', 'flippy') . '/flippy.css');
+  backdrop_add_css(backdrop_get_path('module', 'flippy') . '/css/flippy.css');
 
   // for getting node type
   if ($node = menu_get_object('node')) {
