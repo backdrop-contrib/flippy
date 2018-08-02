@@ -2,5 +2,3 @@ name = Flippy
 backdrop = 1.x
 type = module
 description = Allows administrators to define custom pagers for navigation in lists of nodes.
-dependencies[] = token
-

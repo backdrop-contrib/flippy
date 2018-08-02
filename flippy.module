@@ -34,8 +34,8 @@ function flippy_config_info() {
  * Implements hook_form_FORM_ID_alter().
  */
 function flippy_form_node_type_form_alter(&$form, $form_state) {
-  $config = config('flippy.settings');
   if (isset($form['type'])) {
+    $config = config('node.type.' . $form['type']['#default_value']);
     $form['flippy'] = array(
       '#type' => 'fieldset',
       '#title' => t('Flippy settings'),
@@ -47,13 +47,12 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
     $form['flippy']['flippy'] = array(
       '#type' => 'checkbox',
       '#title' => t('Build a pager for this content type'),
-      '#default_value' => isset($form['flippy']['flippy']) ? $form['flippy']['flippy'] : $config->get('flippy_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy']) ? $form['flippy']['flippy'] : $config->get('settings.flippy_active'),
     );
-
     $form['flippy']['flippy_head'] = array(
       '#type' => 'checkbox',
       '#title' => t('Add semantic previous and next links to the document HEAD'),
-      '#default_value' => isset($form['flippy']['flippy_head']) ? $form['flippy']['flippy_head'] : $config->get('flippy_head_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_head']) ? $form['flippy']['flippy_head'] : $config->get('settings.flippy_head'),
       '#states' => array(
         'visible' => array(// action to take.
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -63,7 +62,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
     $form['flippy']['flippy_show_empty'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show empty links'),
-      '#default_value' => isset($form['flippy']['flippy_show_empty']) ? $form['flippy']['flippy_show_empty'] : $config->get('flippy_show_empty_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_show_empty']) ? $form['flippy']['flippy_show_empty'] : $config->get('settings.flippy_show_empty'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -76,7 +75,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Previous" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_prev_label']) ? $form['flippy']['flippy_prev_label'] : $config->get('flippy_prev_label_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_prev_label']) ? $form['flippy']['flippy_prev_label'] : $config->get('settings.flippy_prev_label'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -88,7 +87,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Next" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_next_label']) ? $form['flippy']['flippy_next_label'] : $config->get('flippy_next_label_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_next_label']) ? $form['flippy']['flippy_next_label'] : $config->get('settings.flippy_next_label'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -99,7 +98,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
     $form['flippy']['flippy_firstlast'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show first/last links'),
-      '#default_value' => isset($form['flippy']['flippy_firstlast']) ? $form['flippy']['flippy_firstlast'] : $config->get('flippy_firstlast_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_firstlast']) ? $form['flippy']['flippy_firstlast'] : $config->get('settings.flippy_firstlast'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -111,7 +110,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "First" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_first_label']) ? $form['flippy']['flippy_first_label'] : $config->get('flippy_first_label_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_first_label']) ? $form['flippy']['flippy_first_label'] : $config->get('settings.flippy_first_label'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy_firstlast]' => array('checked' => TRUE),
@@ -124,7 +123,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Last" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_last_label']) ? $form['flippy']['flippy_last_label'] : $config->get('flippy_last_label_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_last_label']) ? $form['flippy']['flippy_last_label'] : $config->get('settings.flippy_last_label'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy_firstlast]' => array('checked' => TRUE),
@@ -136,7 +135,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
     $form['flippy']['flippy_loop'] = array(
       '#type' => 'checkbox',
       '#title' => t('Loop through nodes'),
-      '#default_value' => isset($form['flippy']['flippy_loop']) ? $form['flippy']['flippy_loop'] : $config->get('flippy_loop_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_loop']) ? $form['flippy']['flippy_loop'] : $config->get('settings.flippy_loop'),
       '#states' => array(
         'visible' => array(// action to take.
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -147,7 +146,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
     $form['flippy']['flippy_random'] = array(
       '#type' => 'checkbox',
       '#title' => t('Show random link'),
-      '#default_value' => isset($form['flippy']['flippy_random']) ? $form['flippy']['flippy_random'] : $config->get('flippy_random_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_random']) ? $form['flippy']['flippy_random'] : $config->get('settings.flippy_random'),
       '#states' => array(
         'visible' => array(// action to take.
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -159,7 +158,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Label for "Random" link'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_random_label']) ? $form['flippy']['flippy_random_label'] : $config->get('flippy_random_label_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_random_label']) ? $form['flippy']['flippy_random_label'] : $config->get('settings.flippy_random_label'),
       '#states' => array(
         'visible' => array(
           ':input[name=flippy_random]' => array('checked' => TRUE),
@@ -188,7 +187,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Truncate label length'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_truncate']) ? $form['flippy']['flippy_truncate'] : $config->get('flippy_truncate_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_truncate']) ? $form['flippy']['flippy_truncate'] : $config->get('settings.flippy_truncate'),
       '#description' => t('Optionally provide a maximum amount length that link labels can be. Labels will be shortened to this length if they exceed the amount of characters.'),
       '#states' => array(
         'visible' => array(
@@ -201,7 +200,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'textfield',
       '#title' => t('Truncate ellipse'),
       '#size' => 32,
-      '#default_value' => isset($form['flippy']['flippy_ellipse']) ? $form['flippy']['flippy_ellipse'] : $config->get('flippy_ellipse_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_ellipse']) ? $form['flippy']['flippy_ellipse'] : $config->get('settings.flippy_ellipse'),
       '#description' => t('If a maximum label length is set above, an ellipse can be provided here which will be appended to the label after it is shortened.'),
       '#states' => array(
         'visible' => array(
@@ -213,7 +212,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
     $form['flippy']['flippy_custom_sorting'] = array(
       '#type' => 'checkbox',
       '#title' => t('Sort the pager by something other than ascending post date'),
-      '#default_value' => isset($form['flippy']['flippy_custom_sorting']) ? $form['flippy']['flippy_custom_sorting'] : $config->get('flippy_custom_sorting_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_custom_sorting']) ? $form['flippy']['flippy_custom_sorting'] : $config->get('settings.flippy_custom_sorting'),
       '#states' => array(
         'visible' => array(// action to take.
           ':input[name=flippy]' => array('checked' => TRUE),
@@ -236,7 +235,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
       '#type' => 'select',
       '#title' => t('Pager sort'),
       '#options' => $sort_options,
-      '#default_value' => isset($form['flippy']['flippy_sort']) ? $form['flippy']['flippy_sort'] : $config->get('flippy_sort_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_sort']) ? $form['flippy']['flippy_sort'] : $config->get('settings.flippy_sort'),
       '#description' => t('Select a field for sorting the pager'),
       '#states' => array(
         'visible' => array(
@@ -252,7 +251,7 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
         'ASC' => 'Ascending',
         'DESC' => 'Descending',
       ),
-      '#default_value' => isset($form['flippy']['flippy_order']) ? $form['flippy']['flippy_order'] : $config->get('flippy_order_' . $form['#node_type']->type),
+      '#default_value' => isset($form['flippy']['flippy_order']) ? $form['flippy']['flippy_order'] : $config->get('settings.flippy_order'),
       '#description' => t('Select a direction to order the pager'),
       '#states' => array(
         'visible' => array(
@@ -260,9 +259,34 @@ function flippy_form_node_type_form_alter(&$form, $form_state) {
         ),
       ),
     );
-
+    $form['#submit'][] = 'flippy_form_node_type_form_submit';
   }
 }
+
+/**
+   * Submit handler for the new "Flippy" options on the Content Type edit form.
+   */
+function flippy_form_node_type_form_submit($form, &$form_state) {
+  $config = config('node.type.' . $form['#node_type']->type);
+  $config->set('settings.flippy_active', $form_state['values']['flippy']);
+  $config->set('settings.flippy_head', $form_state['values']['flippy_head']);
+  $config->set('settings.flippy_show_empty', $form_state['values']['flippy_show_empty']);
+  $config->set('settings.flippy_prev_label', $form_state['values']['flippy_prev_label']);
+  $config->set('settings.flippy_next_label', $form_state['values']['flippy_next_label']);
+  $config->set('settings.flippy_firstlast', $form_state['values']['flippy_firstlast']);
+  $config->set('settings.flippy_first_label', $form_state['values']['flippy_first_label']);
+  $config->set('settings.flippy_last_label', $form_state['values']['flippy_last_label']);
+  $config->set('settings.flippy_loop', $form_state['values']['flippy_loop']);
+  $config->set('settings.flippy_random', $form_state['values']['flippy_random']);
+  $config->set('settings.flippy_random_label', $form_state['values']['flippy_random_label']);
+  $config->set('settings.flippy_truncate', $form_state['values']['flippy_truncate']);
+  $config->set('settings.flippy_ellipse', $form_state['values']['flippy_ellipse']);
+  $config->set('settings.flippy_custom_sorting', $form_state['values']['flippy_custom_sorting']);
+  $config->set('settings.flippy_sort', $form_state['values']['flippy_sort']);
+  $config->set('settings.flippy_order', $form_state['values']['flippy_order']);
+  $config->save();
+}
+
 
 /**
  * List the base node properties that are allowed for custom pager sorting.
@@ -285,7 +309,7 @@ function _flippy_sorting_properties() {
 function flippy_field_extra_fields() {
   $extra = array();
   foreach (node_type_get_names() as $type => $name) {
-    if (config_get('flippy.settings', 'flippy_' . $type)) {
+    if (config_get('node.type.' . $type, 'settings.flippy_active')) {
       $extra['node'][$type] = array(
         'display' => array(
           'flippy_pager' => array(
@@ -320,18 +344,18 @@ function flippy_node_view($node, $view_mode = 'full') {
  *  Function that builds the list of nodes
  */
 function flippy_build_list($node) {
-  $config = config('flippy.settings');
+  $config = config('node.type.' . $node->type);
   $master_list = &backdrop_static(__FUNCTION__);
   if (!isset($master_list)) {
     $master_list = array();
   }
   if (!isset($master_list[$node->nid])) {
     // Check to see if we need custom sorting
-    if ($config->get('flippy_custom_sorting_' . $node->type)) {
+    if ($config->get('settings.flippy_custom_sorting')) {
       // Get order
-      $order = $config->get('flippy_order_' . $node->type);
+      $order = $config->get('settings.flippy_order');
       // Get sort
-      $sort  = $config->get('flippy_sort_' . $node->type);
+      $sort  = $config->get('settings.flippy_sort');
     }
     else {
       $order = 'ASC';
@@ -460,7 +484,7 @@ function flippy_build_list($node) {
     $list['last'] = $last->execute()->fetchAssoc();
 
     // create random list
-    if ($config->get('flippy_random_' . $node->type)) {
+    if ($config->get('settings.flippy_random')) {
 
       $random->orderRandom();
       $list['random'] = $random->execute()->fetchAssoc();
@@ -482,7 +506,6 @@ function flippy_build_list($node) {
  *  Implements template_preprocess_hook()
  */
 function template_preprocess_flippy(&$vars) {
-  $config = config('flippy.settings');
   $links = array();
   backdrop_add_css(backdrop_get_path('module', 'flippy') . '/flippy.css');
 
@@ -490,6 +513,8 @@ function template_preprocess_flippy(&$vars) {
   if ($node = menu_get_object('node')) {
     $vars['node'] = $node;
   }
+
+  $config = config('node.type.' . $vars['node']->type);
 
   // Collect all of the node ids in the list
   $nids = array();
@@ -503,30 +528,30 @@ function template_preprocess_flippy(&$vars) {
   $list_nodes = node_load_multiple($nids);
 
   if ($nav = $vars['list']) {
-    if ($config->get('flippy_firstlast_' . $vars['node']->type)) {
+    if ($config->get('settings.flippy_firstlast')) {
       $links['first'] = array(
-        'title' => t($config->get('flippy_first_label_' . $vars['node']->type)),
+        'title' => t($config->get('settings.flippy_first_label')),
         'href' => empty($nav['first']) ? '' : backdrop_get_path_alias('node/' . $nav['first']['nid'], 'und'),
       );
       $links['last'] = array(
-        'title' => t($config->get('flippy_last_label_' . $vars['node']->type)),
+        'title' => t($config->get('settings.flippy_last_label')),
         'href' => empty($nav['last']) ? '' : backdrop_get_path_alias('node/' . $nav['last']['nid'], 'und'),
       );
     }
 
-    if ($config->get('flippy_random_' . $vars['node']->type)) {
+    if ($config->get('settings.flippy_random')) {
       $links['random'] = array(
-        'title' => t($config->get('flippy_random_label_' . $vars['node']->type)),
+        'title' => t($config->get('settings.flippy_random_label')),
         'href' => empty($nav['random']) ? '' : backdrop_get_path_alias('node/' . $nav['random']['nid'], 'und'),
       );
     }
 
     $links['prev'] = array(
-      'title' => t($config->get('flippy_prev_label_' . $vars['node']->type)),
+      'title' => t($config->get('settings.flippy_prev_label')),
       'href' => empty($nav['prev']) ? '' : ('node/' . $nav['prev']['nid']),
     );
     $links['next'] = array(
-      'title' => t($config->get('flippy_next_label_' . $vars['node']->type)),
+      'title' => t($config->get('settings.flippy_next_label')),
       'href' => empty($nav['next']) ? '' : ('node/' . $nav['next']['nid']),
     );
   }
@@ -541,11 +566,11 @@ function template_preprocess_flippy(&$vars) {
   }
 
   // See if we need to truncate labels
-  if ($truncate = $config->get('flippy_truncate_' . $vars['node']->type)) {
+  if ($truncate = $config->get('settings.flippy_truncate')) {
     if (is_numeric($truncate)) {
       foreach ($links as $key => &$link) {
         if (strlen($link['title']) > $truncate) {
-          $link['title'] = mb_substr($link['title'], 0, $truncate) . $config->get('flippy_ellipse_' . $vars['node']->type);
+          $link['title'] = mb_substr($link['title'], 0, $truncate) . $config->get('settings.flippy_ellipse');
         }
       }
     }
@@ -558,7 +583,7 @@ function template_preprocess_flippy(&$vars) {
     }
   }
 
-  if ($config->get('flippy_loop_' . $vars['node']->type)) {
+  if ($config->get('settings.flippy_loop')) {
     if (!$vars['links']['next']['href']) {
       $vars['links']['next']['href'] = empty($nav['first']) ? '' : backdrop_get_path_alias('node/' . $nav['first']['nid'], 'und');
       $vars['links']['next']['title'] = (empty($nav['first']) || empty($vars['links']['next']['title'])) ? '' : token_replace($vars['links']['next']['title'], array('node' => $list_nodes[$nav['first']['nid']]));
@@ -568,7 +593,7 @@ function template_preprocess_flippy(&$vars) {
       $vars['links']['prev']['title'] = (empty($nav['last']) ||  empty($vars['links']['prev']['title'])) ? '' : token_replace($vars['links']['prev']['title'], array('node' => $list_nodes[$nav['last']['nid']]));
     }
   }
-  $vars['show_empty'] = $config->get('flippy_show_empty_' . $vars['node']->type);
+  $vars['show_empty'] = $config->get('settings.flippy_show_empty');
   $vars = array_merge($vars, $vars['list']);
   unset($vars['list']);
   unset($vars['node']);
@@ -590,7 +615,7 @@ function flippy_block_info() {
   // Provide node-type specific pager blocks
   foreach (node_type_get_types() as $type) {
     // See if this node type has pagers enabled
-    if (config_get('flippy.settings', "flippy_{$type->type}")) {
+    if (config_get('node.type.' . $type->type, 'settings.flippy_active')) {
       // Add support for machine names > 32 chars
       if (strlen("flippy_pager-node_type-{$type->type}") > 32) {
         $delta = flippy_block_hash_delta($type->type);
@@ -599,7 +624,7 @@ function flippy_block_info() {
         $delta = "flippy_pager-node_type-{$type->type}";
       }
       $blocks[$delta] = array(
-        'info' => t('Flippy Pager (@type nodes)', array('@type' => $type->name)),
+        'info' => t('Flippy Pager (@type content)', array('@type' => $type->name)),
         'cache' => BACKDROP_NO_CACHE,
       );
     }
@@ -687,7 +712,7 @@ function _flippy_use_pager($node) {
   if (!is_object($node)) {
     return FALSE;
   }
-  return node_is_page($node) && config_get('flippy.settings', 'flippy_' . $node->type);
+  return node_is_page($node) && config_get('node.type.' . $node->type, 'settings.flippy_active');
 }
 
 /**
@@ -699,7 +724,7 @@ function _flippy_use_pager($node) {
  */
 function _flippy_add_head_elements($node) {
   if (is_object($node)) {
-    if (config_get('flippy.settings', 'flippy_head_' . $node->type)) {
+    if (config_get('node.type.' . $node->type, 'settings.flippy_head')) {
       $links = flippy_build_list($node);
       if (!empty($links['prev'])) {
         backdrop_add_html_head_link(array(
