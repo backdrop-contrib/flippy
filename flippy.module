@@ -386,15 +386,10 @@ function flippy_build_list($node) {
     $up   = ($order == 'ASC') ? 'ASC' : 'DESC';
     $down = ($order == 'ASC') ? 'DESC' : 'ASC';
     // Create a starting-point EntityFieldQuery object
-    global $language;
     $query = db_select('node', 'n');
     $query->condition('n.type', $node->type)
       ->condition('n.status', 1)
       ->condition('n.nid', $node->nid, '!=')
-      ->condition(db_or()
-        ->condition('n.language', array($language->language, LANGUAGE_NONE), 'IN')
-        ->condition('n.language', $node->language, '=')
-      )
       ->fields('n', array('nid', 'title'))
       ->range(0, 1)
       ->addTag('node_access')
