@@ -1,4 +1,4 @@
-# Flippy
+# ![Flippy](https://github.com/backdrop-contrib/flippy/blob/1.x-1.x/images/flippy.png "Flippy for BackdropCMS")
 
 Flippy is an ultra-simple module that generates previous/next pagers for content
 types. On a content type's administration screen, you can turn Flippy on or off
@@ -11,7 +11,7 @@ there, too.
 
 If you turn on Flippy for a content type, but hide the pager in the Manage
 Display page, its links will still be available in the theme layer when it comes
-time to output node.tpl.php. If you like, you can weave the pager links right
+time to output `node.tpl.php`. If you like, you can weave the pager links right
 into the node manually in your own templates. A block is also created so you
 can add the block to your Layout wherever you wish.
 
@@ -44,7 +44,7 @@ content type on which you would like to have Flippy enabled.
     - If checked, choose the field for sorting the pager.
     - Select pager order.
   - Click the "Save Content Type" button to save the settings. 
-
+  
 You can control the placement of the Pager in the "Manage Display" section
 for the content type in question. A block is also available in the Layouts 
 section in case you want to position the Flippy pager that way (in this case,

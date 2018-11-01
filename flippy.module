@@ -299,7 +299,7 @@ function _flippy_sorting_properties() {
   return array(
     'created' => t('Post date'),
     'title' => t('Title'),
-    'nid' => t('Node ID'),
+    'nid' => t('Content ID'),
   );
 }
 
